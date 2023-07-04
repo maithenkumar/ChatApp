@@ -62,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: ListView.builder(
                     itemCount: 12,
+                    physics: BouncingScrollPhysics(),
                     itemBuilder: (context, index) => SepreateChatBOxContainer(
                       name: 'Maitheen',
                       message: 'hi da eppadi irrika',
