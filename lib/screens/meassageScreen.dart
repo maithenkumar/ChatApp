@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/left_chat_container.dart';
 import '../Widgets/right_chat_container.dart';
 import '../Widgets/specalApp.dart';
 import '../Widgets/text_message.dart';
+import 'package:socket_io_client/socket_io_client.dart ' as IO;
 
 class MeassageScreen extends StatefulWidget {
   const MeassageScreen({super.key});
@@ -13,74 +15,110 @@ class MeassageScreen extends StatefulWidget {
 }
 
 class _MeassageScreenState extends State<MeassageScreen> {
-  TextEditingController controller = TextEditingController();
-  List data = [
-    {
-      "leftmsg": "hi da \nhow are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi d\n how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da \nhow are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-    },
-    {
-      "leftmsg": "hi d\n how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-    {
-      "leftmsg": "hi da how are you ",
-      "rightmsg": "haan hi iam so good ",
-    },
-  ];
+//   TextEditingController controller = TextEditingController();
 
-  addmesage(message) {
-    setState(() {});
+//   List _data = [
+
+//   ];
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+//     connectedtoServer();
+//   }
+// List _message=[];
+//   addmesage(message) {
+//     setState(() {});
+//   }
+//  late IO.Socket socket;
+// void connectedtoServer(){
+//   socket =IO.io("http://localhost:3000",<String ,dynamic>{
+//     "transport":["websocket"]
+//   });
+//   socket.onConnect((_) {
+// print("connected");
+// socket.emit("jion","chatRoom");
+//   });
+//   socket.on("chat message", (data) {
+
+//     setState(() {
+//       _data.add(data);
+//       print(_data);
+//     });
+//   });
+//   socket.onDisconnect((data) =>
+//    print("Dissconnected"));
+// }
+// void _sendMessage(){
+//   final String message=controller.text.trim();
+//   if (message.isNotEmpty) {
+//     socket.emit("chat message",{
+//       "room":"chatRoom"
+//       ,"message":message
+//     });
+//      controller.clear();
+
+//   }
+// }
+// @override
+//   void dispose() {
+//     // TODO: implement dispose
+//     super.dispose();
+//     socket.dispose();
+//   }
+  final TextEditingController _textController = TextEditingController();
+  final List<String> _messages = [];
+
+  late IO.Socket socket;
+String clientId='';
+  @override
+  void initState() {
+    super.initState();
+    connectToServer();
+  }
+
+  void connectToServer() {
+    socket = IO.io('http://localhost:3000', <String, dynamic>{
+      'transports': ['websocket'],
+    });
+
+    socket.onConnect((_) {
+      print('Connected');
+      socket.emit('join', 'chatRoom');
+    });
+
+    socket.on('chat message', (data) {
+      setState(() {
+        _messages.add(data);
+      });
+    });
+socket.on('client_id', (data) {
+      setState(() {
+        clientId = data; // Receive the client ID from the server
+        if (kDebugMode) {
+          print(clientId);
+        }
+      });
+    });
+    socket.onDisconnect((_) => print('Disconnected'));
+  }
+
+  void _sendMessage() {
+    final String message = _textController.text.trim();
+    if (message.isNotEmpty) {
+      socket.emit('chat message', {
+        'room': 'chatRoom',
+        'client': clientId,
+      });
+       print("this for client id ${socket.id}");
+      _textController.clear();  
+    }
+  }
+
+  @override 
+  void dispose() {
+    socket.disconnect();
+    super.dispose();
   }
 
   @override
@@ -91,42 +129,35 @@ class _MeassageScreenState extends State<MeassageScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Stack(
           children: [
-            // Positioned(
-            //   top: 0,
-            //   child: LeftChatContainer()),
-            //   Positioned(
-            //     top: 10,
-            //     right: 0,
-            //     child: RightChatContainer()),
-
-            //
+            
             Column(
               children: [
                 Expanded(
                   child: ListView.builder(
                     shrinkWrap: true,
                     reverse: true,
-                    itemCount: data.length,
+                    itemCount: _messages.length,
                     physics: ClampingScrollPhysics(),
                     itemBuilder: (context, index) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        data[index]["leftmsg"] == null
-                            ? const Text('')
-                            : LeftChatContainer(
-                                leftText: data[index]["leftmsg"],
+                        // _messages[index] == null
+                        //     ? const Text('')
+                        //     :
+                            LeftChatContainer(
+                                leftText: _messages[index],
                               ),
-                        Row(
-                          children: [
-                            const Spacer(),
-                            data[index]["rightmsg"] == null
-                                ? const Text('')
-                                : RightChatContainer(
-                                    rightText: data[index]["rightmsg"],
-                                  ),
-                          ],
-                        ),
+                        // Row(
+                        //   children: [
+                        //     const Spacer(),
+                        //     _messages[index] == null
+                        //         ? const Text('')
+                        //         : RightChatContainer(
+                        //             rightText: _messages[index],
+                        //           ),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -141,8 +172,13 @@ class _MeassageScreenState extends State<MeassageScreen> {
               left: 0,
               right: 0,
               child: TextMessageField(
-                controller: controller,
-                fun: () {},
+                controller: _textController,
+                fun: () {
+                  _sendMessage();
+                  setState(() {
+                    print(_messages);
+                  });
+                },
               ),
             )
           ],

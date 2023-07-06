@@ -2,10 +2,11 @@
 import 'package:chat_app/screens/meassageScreen.dart';
 import 'package:flutter/material.dart';
 
+import 'screens/exapmle.dart';
 import 'screens/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MeassageScreen()
+      home: HomeScreen()
 
     );
   }

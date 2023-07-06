@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 AppBar SpacelAppBar() {
   return AppBar(
+    automaticallyImplyLeading: false,
     flexibleSpace: Container(
       margin: EdgeInsets.symmetric(horizontal: 10),
       padding: EdgeInsets.only(left: 5, right: 10, top: 5, bottom: 5),

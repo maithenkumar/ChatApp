@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 AppBar appbar({required String title}) {
   return AppBar(
+    automaticallyImplyLeading: false,
+    
     title: Text(
       title,
       style: const TextStyle(

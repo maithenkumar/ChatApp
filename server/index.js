@@ -44,7 +44,7 @@ const { log } = require('console');
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
-const client=1
+const client = 1
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -63,8 +63,8 @@ io.on('connection', (socket) => {
     socket.on('chat message', (data) => {
 
         io.to(data.room).emit('chat message', {
-            'message':data.message,
-            ""
+            'message': data.message,
+            "client": data.clientId
         });
         console.log(`Message received: ${data.message}`);
         console.log(`this client id ${clientId} `);
